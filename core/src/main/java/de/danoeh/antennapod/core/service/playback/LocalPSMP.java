@@ -808,7 +808,7 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
                 }
 
                 if (nextMedia != null) {
-                    callback.onPlaybackEnded(nextMedia.getMediaType(), !playNextEpisode);
+                    callback.onPlaybackEnded(currentMedia, nextMedia.getMediaType(), !playNextEpisode);
                     // setting media to null signals to playMediaObject() that we're taking care of post-playback processing
                     media = null;
                     playMediaObject(nextMedia, false, !nextMedia.localFileAvailable(), playNextEpisode, playNextEpisode);
@@ -816,7 +816,7 @@ public class LocalPSMP extends PlaybackServiceMediaPlayer {
             }
             if (shouldContinue || toStoppedState) {
                 if (nextMedia == null) {
-                    callback.onPlaybackEnded(null, true);
+                    callback.onPlaybackEnded(currentMedia, null, true);
                     stop();
                 }
                 final boolean hasNext = nextMedia != null;

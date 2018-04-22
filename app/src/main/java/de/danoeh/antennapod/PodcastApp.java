@@ -11,6 +11,7 @@ import com.joanzapata.iconify.fonts.MaterialModule;
 import de.danoeh.antennapod.core.ClientConfig;
 import de.danoeh.antennapod.core.feed.EventDistributor;
 import de.danoeh.antennapod.spa.SPAUtil;
+import podcast.statistics.collector.PodcastStatisticsCollector;
 
 /** Main application class. */
 public class PodcastApp extends Application {
@@ -58,6 +59,8 @@ public class PodcastApp extends Application {
 		Iconify.with(new MaterialModule());
 
         SPAUtil.sendSPAppsQueryFeedsIntent(this);
+
+        PodcastStatisticsCollector.activate(getApplicationContext(), "API_KEY");
     }
 
 }

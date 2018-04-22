@@ -358,7 +358,7 @@ public abstract class PlaybackServiceMediaPlayer {
 
         Playable getNextInQueue(Playable currentMedia);
 
-        void onPlaybackEnded(MediaType mediaType, boolean stopPlaying);
+        void onPlaybackEnded(Playable playable, MediaType mediaType, boolean stopPlaying);
     }
 
     /**

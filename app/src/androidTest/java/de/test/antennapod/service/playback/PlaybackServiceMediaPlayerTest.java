@@ -809,7 +809,7 @@ public class PlaybackServiceMediaPlayerTest extends InstrumentationTestCase {
         }
 
         @Override
-        public void onPlaybackEnded(MediaType mediaType, boolean stopPlaying) {
+        public void onPlaybackEnded(Playable playable, MediaType mediaType, boolean stopPlaying) {
 
         }
     }

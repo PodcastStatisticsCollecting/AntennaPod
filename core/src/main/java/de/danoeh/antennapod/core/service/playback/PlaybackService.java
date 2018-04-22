@@ -69,6 +69,10 @@ import de.danoeh.antennapod.core.util.QueueAccess;
 import de.danoeh.antennapod.core.util.playback.ExternalMedia;
 import de.danoeh.antennapod.core.util.playback.Playable;
 import de.greenrobot.event.EventBus;
+import podcast.statistics.collector.PodcastStatisticsCollector;
+import podcast.statistics.collector.api.EndedEvent;
+import podcast.statistics.collector.api.PauseEvent;
+import podcast.statistics.collector.api.PlayEvent;
 
 /**
  * Controls the MediaPlayer that plays a FeedMedia-file
@@ -732,12 +736,21 @@ public class PlaybackService extends MediaBrowserServiceCompat {
 
         @Override
         public void onPlaybackStart(@NonNull Playable playable, int position) {
+            int currentTime = 0;
+
             taskManager.startWidgetUpdater();
             if (position != PlaybackServiceMediaPlayer.INVALID_TIME) {
                 playable.setPosition(position);
+                currentTime = position;
             }
             playable.onPlaybackStart();
             taskManager.startPositionSaver();
+
+            PodcastStatisticsCollector.play(PlayEvent.builder()
+                    .setTitle(playable.getEpisodeTitle())
+                    .setPodcastName(playable.getFeedTitle())
+                    .setDuration((double) playable.getDuration() / 1000)
+                    .setCurrentTime((double) currentTime / 1000));
         }
 
         @Override
@@ -748,6 +761,12 @@ public class PlaybackService extends MediaBrowserServiceCompat {
             taskManager.cancelWidgetUpdater();
             if (playable != null) {
                 playable.onPlaybackPause(getApplicationContext());
+
+                PodcastStatisticsCollector.pause(PauseEvent.builder()
+                        .setTitle(playable.getEpisodeTitle())
+                        .setPodcastName(playable.getFeedTitle())
+                        .setDuration((double) playable.getDuration() / 1000)
+                        .setCurrentTime((double) playable.getPosition() / 1000));
             }
         }
 
@@ -757,8 +776,16 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         }
 
         @Override
-        public void onPlaybackEnded(MediaType mediaType, boolean stopPlaying) {
+        public void onPlaybackEnded(Playable playable, MediaType mediaType, boolean stopPlaying) {
             PlaybackService.this.onPlaybackEnded(mediaType, stopPlaying);
+
+            if (playable != null) {
+                PodcastStatisticsCollector.ended(EndedEvent.builder()
+                        .setTitle(playable.getEpisodeTitle())
+                        .setPodcastName(playable.getFeedTitle())
+                        .setDuration((double) playable.getDuration() / 1000)
+                        .setCurrentTime((double) playable.getPosition() / 1000));
+            }
         }
     };
 
